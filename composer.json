@@ -1,0 +1,21 @@
+{
+    "name": "zeecoder/good-to-know",
+    "description": "A solution for collecting good-to-know facts to show to users.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hubert Viktor",
+            "email": "rpgmorpheus@gmail.com"
+        }
+    ],
+    "require": {
+    },
+    "require-dev": {
+        "symfony/translation": "^2.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZeeCoder\\GoodToKnow\\": "src/ZeeCoder/GoodToKnow/"
+        }
+    }
+}
