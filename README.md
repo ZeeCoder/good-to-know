@@ -1,2 +1,2 @@
 # Good To Know
-[![Project Status](https://stillmaintained.com/ZeeCoder/good-to-know.png)](https://stillmaintained.com/ZeeCoder/good-to-know)
+[![Project Status](http://stillmaintained.com/ZeeCoder/good-to-know.png)](http://stillmaintained.com/ZeeCoder/good-to-know)
