@@ -36,20 +36,20 @@ class GoodToKnow
 
         $groupStrings = [];
         foreach ($this->config as $stringData) {
-            // Converting the groups parameter to array
-            if (!is_array($stringData['groups'])) {
-                $stringData['groups'] = [$stringData['groups']];
+            // Converting the group parameter to array
+            if (!is_array($stringData['group'])) {
+                $stringData['group'] = [$stringData['group']];
             }
 
             // Checking the current string if it's in the requested group
-            if (!in_array($group, $stringData['groups'])) {
+            if (!in_array($group, $stringData['group'])) {
                 continue;
             }
 
             // Getting the string without parameters
             $rawString = $this->translator === null
-                ? $stringData['key']
-                : $this->translator->trans($stringData['key'], [], $this->translationDomain);
+                ? $stringData['text']
+                : $this->translator->trans($stringData['text'], [], $this->translationDomain);
 
             // Adding the parameters to the string
             $groupStrings[] = $this->addParametersToString($rawString);
@@ -96,7 +96,7 @@ class GoodToKnow
     }
 
     /**
-     * Adds a translator, which is used to translate the "keys".
+     * Adds a translator, which is used to translate the texts.
      * @param Object $translator The translator service
      * @param string $translationDomain The translation domain used by the translator.
      */
@@ -109,7 +109,7 @@ class GoodToKnow
     }
 
     /**
-     * Adds a parameter, which can be used in the keys.
+     * Adds a parameter, which can be used in the texts.
      * @param string $name The name which can appear in the texts.
      * @param mixed $value Can be a value, which can be inserted into the text,
      * or a callable.

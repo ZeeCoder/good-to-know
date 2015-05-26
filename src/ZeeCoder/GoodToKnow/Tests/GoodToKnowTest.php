@@ -10,17 +10,17 @@ class GoodToKnowTest extends \PHPUnit_Framework_TestCase
     public function testGroups()
     {
         $goodToKnow = new GoodToKnow([
-            ['key' => 'key', 'groups' => 'group'],
-            ['key' => 'key2', 'groups' => ['group', 'group2']],
-            ['key' => 'key3', 'groups' => 'group2'],
+            ['text' => 'text', 'group' => 'group'],
+            ['text' => 'text2', 'group' => ['group', 'group2']],
+            ['text' => 'text3', 'group' => 'group2'],
         ]);
 
         $this->assertEquals([
-            'key', 'key2'
+            'text', 'text2'
         ], $goodToKnow->getAllByGroup('group'));
 
         $this->assertEquals([
-            'key2', 'key3'
+            'text2', 'text3'
         ], $goodToKnow->getAllByGroup('group2'));
 
         $this->setExpectedException(
@@ -33,7 +33,7 @@ class GoodToKnowTest extends \PHPUnit_Framework_TestCase
     public function testParameters()
     {
         $goodToKnow = new GoodToKnow([
-            ['key' => '%param1% - %param2% - %param3%', 'groups' => 'group'],
+            ['text' => '%param1% - %param2% - %param3%', 'group' => 'group'],
         ]);
 
         $goodToKnow->addParameter('%param1%', 'value1');
@@ -56,7 +56,7 @@ class GoodToKnowTest extends \PHPUnit_Framework_TestCase
         ], 'en', 'custom_trans_domain');
 
         $goodToKnow = new GoodToKnow([
-            ['key' => 'trans_key', 'groups' => 'group'],
+            ['text' => 'trans_key', 'group' => 'group'],
         ]);
         $goodToKnow->addParameter('%param%', 'paramvalue');
         $goodToKnow->addTranslator($translator, 'custom_trans_domain');
@@ -67,7 +67,7 @@ class GoodToKnowTest extends \PHPUnit_Framework_TestCase
         );
 
         $goodToKnow = new GoodToKnow(
-            [['key' => 'trans_key', 'groups' => 'group']],
+            [['text' => 'trans_key', 'group' => 'group']],
             [
                 $translator,
                 'custom_trans_domain'
