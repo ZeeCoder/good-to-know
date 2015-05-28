@@ -7,6 +7,23 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class GoodToKnowTest extends \PHPUnit_Framework_TestCase
 {
+    public function testAddConfiguration()
+    {
+        $gtk = new GoodToKnow();
+
+        $gtk->addConfiguration([
+            ['text' => 'text1', 'group' => 'group'],
+            ['text' => 'text2', 'group' => 'group']
+        ]);
+        $gtk->addConfiguration([
+            ['text' => 'text3', 'group' => 'group']
+        ]);
+
+        $this->assertEquals([
+            'text1', 'text2', 'text3'
+        ], $gtk->getAllByGroup('group'));
+    }
+
     public function testGroups()
     {
         $goodToKnow = new GoodToKnow([
