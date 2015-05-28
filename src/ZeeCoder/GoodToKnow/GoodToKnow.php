@@ -4,7 +4,7 @@ namespace ZeeCoder\GoodToKnow;
 
 class GoodToKnow
 {
-    private $config;
+    private $config = [];
     private $translator;
     private $translationDomain = 'good_to_know';
     private $parameters = [];
@@ -14,13 +14,20 @@ class GoodToKnow
      * @param array $translatorConfig If given, then it is passed to the
      * `addTranslator` method.
      */
-    public function __construct(array $config, array $translatorConfig = null)
-    {
-        $this->config = $config;
+    public function __construct(
+        array $config = [],
+        array $translatorConfig = null
+    ) {
+        $this->addConfiguration($config);
 
         if ($translatorConfig !== null) {
             call_user_func_array([$this, 'addTranslator'], $translatorConfig);
         }
+    }
+
+    public function addConfiguration(array $config)
+    {
+        $this->config = array_merge($this->config, $config);
     }
 
     /**

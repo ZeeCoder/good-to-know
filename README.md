@@ -118,6 +118,30 @@ $factsForGroupA = $GoodToKnow->getAllByGroup('A');
 
 Parameters are working just the same with translations.
 
+## Adding configurations later
+
+If for some reason you can't pass the configurations when the object is being
+created, calling the `addConfiguration` method could solve your problem:
+
+```php
+<?php
+
+$GoodToKnow = new GoodToKnow();
+
+// later
+$GoodToKnow->addConfiguration([
+    ['text' => 'text1', 'group' => 'group'],
+    ['text' => 'text2', 'group' => 'group'],
+]);
+
+// later
+$GoodToKnow->addConfiguration([
+    ['text' => 'text3', 'group' => 'group'],
+]);
+
+// you get the idea :)
+```
+
 ## License
 [MIT](LICENSE)
 
