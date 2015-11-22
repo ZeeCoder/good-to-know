@@ -4,10 +4,12 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - 7.0
   - hhvm
 
 matrix:
     allow_failures:
+        - php: 7.0
         - php: hhvm
 
 install:
@@ -16,3 +18,6 @@ install:
 
 script:
   - phpunit
+
+before_install:
+  - php /home/travis/.phpenv/versions/5.4/bin/composer self-update

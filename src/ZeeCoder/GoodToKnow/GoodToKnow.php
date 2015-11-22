@@ -2,130 +2,91 @@
 
 namespace ZeeCoder\GoodToKnow;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use ZeeCoder\GoodToKnow\Event\CollectionEvent;
+use ZeeCoder\GoodToKnow\Event\TransformEvent;
+use ZeeCoder\GoodToKnow\Repository\RepositoryInterface;
+
 class GoodToKnow
 {
-    private $config = [];
-    private $translator;
-    private $translationDomain = 'good_to_know';
-    private $parameters = [];
+    private $repository;
+    private $dispatcher;
 
     /**
-     * @param array $config
-     * @param array $translatorConfig If given, then it is passed to the
-     * `addTranslator` method.
+     * @param RepositoryInterface $repository
+     * @param EventDispatcherInterface|null $dispatcher If no dispatcher is
+     * given, one gets created.
      */
     public function __construct(
-        array $config = [],
-        array $translatorConfig = null
+        RepositoryInterface $repository,
+        EventDispatcherInterface $dispatcher= null
     ) {
-        $this->addConfiguration($config);
+        $this->repository = $repository;
 
-        if ($translatorConfig !== null) {
-            call_user_func_array([$this, 'addTranslator'], $translatorConfig);
-        }
-    }
-
-    public function addConfiguration(array $config)
-    {
-        $this->config = array_merge($this->config, $config);
-    }
-
-    /**
-     * Gets the good to know strings for a given group.
-     * @param string $group
-     * @return array An array of good to know strings
-     */
-    public function getAllByGroup($group = null)
-    {
-        if ($group === null) {
-            throw new \RuntimeException('Missing "group" parameter.');
-        }
-
-        $groupStrings = [];
-        foreach ($this->config as $stringData) {
-            // Converting the group parameter to array
-            if (!is_array($stringData['group'])) {
-                $stringData['group'] = [$stringData['group']];
-            }
-
-            // Checking the current string if it's in the requested group
-            if (!in_array($group, $stringData['group'])) {
-                continue;
-            }
-
-            // Getting the string without parameters
-            $rawString = $this->translator === null
-                ? $stringData['text']
-                : $this->translator->trans($stringData['text'], [], $this->translationDomain);
-
-            // Adding the parameters to the string
-            $groupStrings[] = $this->addParametersToString($rawString);
-        }
-
-        return $groupStrings;
-    }
-
-    /**
-     * Returns a string which has the injected parameters.
-     * @param string $string The string the parameters need to be injected into.
-     */
-    private function addParametersToString($string)
-    {
-        $params = $this->getParametersForString($string);
-        return str_replace($params['names'], $params['values'], $string);
-    }
-
-    /**
-     * Inspects the given string, and returns an array of parameters it needs.
-     * @param string $string
-     * @return An array of parameters that can be used for a str_replace call
-     */
-    private function getParametersForString($string)
-    {
-        $params = [
-            'names' => [],
-            'values' => [],
-        ];
-
-        foreach ($this->parameters as $parameterData) {
-            if (strpos($string, $parameterData['name']) === false) {
-                continue;
-            }
-
-            $params['names'][] = $parameterData['name'];
-            $params['values'][] =
-                is_callable($parameterData['value'])
-                    ? call_user_func($parameterData['value'])
-                    : $parameterData['value'];
-        }
-
-        return $params;
-    }
-
-    /**
-     * Adds a translator, which is used to translate the texts.
-     * @param Object $translator The translator service
-     * @param string $translationDomain The translation domain used by the translator.
-     */
-    public function addTranslator($translator, $translationDomain = null)
-    {
-        $this->translator = $translator;
-        if ($translationDomain !== null) {
-            $this->translationDomain = $translationDomain;
+        if (null === $dispatcher) {
+            $this->dispatcher = new EventDispatcher;
+        } else {
+            $this->dispatcher = $dispatcher;
         }
     }
 
     /**
-     * Adds a parameter, which can be used in the texts.
-     * @param string $name The name which can appear in the texts.
-     * @param mixed $value Can be a value, which can be inserted into the text,
-     * or a callable.
+     * Forwards the call to the repository, then dispatches events.
+     * @param array|null $groups
+     * @throws \RuntimeException if the called method does not exist in the
+     * repository
+     * @return mixed The repository's results with transformations possibly
+     * applied by listeners.
      */
-    public function addParameter($name, $value)
+    public function __call($methodName, array $arguments)
     {
-        $this->parameters[] = [
-            'name' => $name,
-            'value' => $value,
-        ];
+        if (!method_exists($this->repository, $methodName)) {
+            throw new \RuntimeException('`' . $methodName . '` does not exists in the given repository.');
+        }
+
+        $factCollection = call_user_func_array([$this->repository, $methodName], $arguments);
+
+        $this->dispatcher->dispatch(Events::PRE_TRANSFORM, new CollectionEvent($factCollection));
+
+        foreach ($factCollection as $fact) {
+            $this->dispatcher->dispatch(Events::TRANSFORM, new TransformEvent($fact));
+        }
+
+        $this->dispatcher->dispatch(Events::POST_TRANSFORM, new CollectionEvent($factCollection));
+
+        return $factCollection;
+    }
+
+    /**
+     * @param RepositoryInterface $repository
+     */
+    public function setRepository(RepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * @return RepositoryInterface
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 }

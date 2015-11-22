@@ -9,13 +9,19 @@
         }
     ],
     "require": {
+        "php": ">=5.3",
+        "symfony/yaml": "^2.7",
+        "symfony/event-dispatcher": "^2.8"
     },
     "require-dev": {
-        "symfony/translation": "^2.6"
+        "phpunit/phpunit": "^4.8"
     },
     "autoload": {
         "psr-4": {
             "ZeeCoder\\GoodToKnow\\": "src/ZeeCoder/GoodToKnow/"
         }
+    },
+    "config": {
+        "bin-dir": "bin"
     }
 }
