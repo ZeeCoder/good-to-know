@@ -164,7 +164,7 @@ Consider looking at the source files, in order to enhance / alter basic function
 
 - [Events](src/ZeeCoder/GoodToKnow/Events.php)
 - [Repositories](src/ZeeCoder/GoodToKnow/Repository)
-- [The Fact Object](src/ZeeCoder/GoodToKnow/Fact)
+- [The Fact Object](src/ZeeCoder/GoodToKnow/Fact.php)
 
 ## License
 [MIT](LICENSE)
